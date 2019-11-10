@@ -32,3 +32,5 @@ def plti(im, h=10, **kwargs):
     plt.axis('off')
 
 plti(im)
+
+
