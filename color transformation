@@ -1,0 +1,21 @@
+def do_normalise(im):
+    return -np.log(1/((1 + im)/257) - 1)
+ 
+def undo_normalise(im):
+    return (1 + 1/(np.exp(-im) + 1) * 257).astype("uint8")
+
+def rotation_matrix(theta):
+    """
+    3D rotation matrix around the X-axis by angle theta
+    """
+    return np.c_[
+        [1,0,0],
+        [0,np.cos(theta),-np.sin(theta)],
+        [0,np.sin(theta),np.cos(theta)]
+    ]
+
+im_normed = do_normalise(im)
+im_rotated = np.einsum("ijk,lk->ijl", im_normed, rotation_matrix(np.pi))
+im2 = undo_normalise(im_rotated)
+
+plti(im2)
