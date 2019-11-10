@@ -1,0 +1,41 @@
+#Segmentation
+
+def simple_threshold(im, threshold=128):
+    return ((im > threshold) * 255).astype("uint8")
+
+thresholds = [100,120,128,138,150]
+
+fig, axs = plt.subplots(nrows=1, ncols=len(thresholds), figsize=(20,50));
+gray_im = to_grayscale(im)
+                        
+for t, ax in zip(thresholds, axs):
+    ax.imshow(simple_threshold(gray_im, t), cmap='Greys');
+    ax.set_title("Threshold: {}".format(t), fontsize=20);
+    ax.set_axis_off();
+    
+def otsu_threshold(im):
+
+    pixel_counts = [np.sum(im == i) for i in range(256)]
+
+    s_max = (0,-10)
+    ss = []
+    for threshold in range(256):
+
+        # update
+        w_0 = sum(pixel_counts[:threshold])
+        w_1 = sum(pixel_counts[threshold:])
+
+        mu_0 = sum([i * pixel_counts[i] for i in range(0,threshold)]) / w_0 if w_0 > 0 else 0       
+        mu_1 = sum([i * pixel_counts[i] for i in range(threshold, 256)]) / w_1 if w_1 > 0 else 0
+
+        # calculate 
+        s = w_0 * w_1 * (mu_0 - mu_1) ** 2
+        ss.append(s)
+
+        if s > s_max[1]:
+            s_max = (threshold, s)
+            
+    return s_max[0]
+
+t = otsu_threshold(gray_im)
+plti(simple_threshold(gray_im, t), cmap='Greys')
