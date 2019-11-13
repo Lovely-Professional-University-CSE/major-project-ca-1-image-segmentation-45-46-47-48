@@ -7,6 +7,32 @@ im = plt.imread("BTD.jpg")
 
 im.shape
 
+import skfuzzy as fuzz
+from skfuzzy import control as ctrl
+pix = ctrl.Antecedent(np.arange(0,1,.1),'pix')
+col = ctrl.Consequent(np.arange(0,3,.1),'col')
+pix['l'] = fuzz.trimf(pix.universe,[0,.2,.4])
+pix['m'] = fuzz.trimf(pix.universe,[.3,.6,.7])
+pix['h'] = fuzz.trimf(pix.universe,[.6,.8,1])
+col['l'] = fuzz.trimf(col.universe,[0,.5,1])
+col['m'] = fuzz.trimf(col.universe,[1,1.7,2])
+col['h'] = fuzz.trimf(col.universe,[2.2,2.7,3])
+pix.view()
+rule1 = ctrl.Rule(pix['l'] , col['l'])
+rule2 = ctrl.Rule(pix['m'] , col['m'])
+rule3 = ctrl.Rule(pix['h'] , col['h'])
+
+cs_ctrl = ctrl.ControlSystem(([rule1,rule2,rule3]))
+cs = ctrl.ControlSystemSimulation(cs_ctrl)
+
+gray_r = gray.reshape(gray.shape[0]*gray.shape[1])
+for i in range(gray_r.shape[0]):
+    cs.input['pix']=gray_r[i]
+    cs.compute()
+    gray_r[i] = cs.output['col']
+gray1 = gray_r.reshape(gray.shape[0],gray.shape[1])
+plt.imshow(gray1, cmap='gray')
+
 def plti(im, h=10, **kwargs):
     """
     Helper function to plot an image.
