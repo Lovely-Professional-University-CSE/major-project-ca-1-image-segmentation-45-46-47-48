@@ -12,6 +12,10 @@ kernel = np.ones((3,3),np.uint8)
 opening = cv.morphologyEx(thresh,cv.MORPH_OPEN,kernel, iterations = 2)
 #plt.imshow(opening)
 sure_bg = cv.dilate(opening,kernel,iterations=3)
+# Finding sure foreground area
+dist_transform = cv.distanceTransform(opening,cv.DIST_L2,5)
+ret, sure_fg = cv.threshold(dist_transform,0.7*dist_transform.max(),255,0)
+
 #plt.imshow(sure_bg)
 plt.imshow(sure_fg)
 # Finding unknown region
